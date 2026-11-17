@@ -9,7 +9,7 @@ missing-modality attention masks, and the DCNv2 explicit-crossing core
 retained from v1.
 
 <p align="center">
-  <img src="docs/workflow.png" width="820" alt="OrgDrug architecture"/>
+  <img src="docs/worflow.png" width="820" alt="OrgDrug architecture"/>
 </p>
 
 **Headline results** (five cohorts, decision accuracy = AUROC separating
