@@ -113,13 +113,38 @@ Or invoke the scripts directly (`python src/train_orgdrug_lclo.py --help`).
 | `data/processed/scfoundation_cell_{emb,ids}.npy` | scFoundation 3072-d cell embeddings | LCLO, transfer |
 | `data/raw/ccle/hf/` | PRISM 19Q4 secondary screen + DPC→SMILES map | prism, tox |
 | `data/processed/geo/` | organoid cohorts (CRC/PDAC/BLCA pairs + embeddings) | transfer |
-| `models/gdrnet_s{seed}.pt` | GDRNet v1 checkpoints (for `--init-v1`) | transfer |
+| `models/*.pt` | pretrained OrgDrug checkpoints (see *Pretrained weights* below) | transfer, tox |
 | `$TAHOE_DIR` | Tahoe-100M perturbation atlas (optional, huge) | tahoe |
 
 GDSC, DepMap and PRISM require registration with their providers
 (https://www.cancerrxgene.org, https://depmap.org, https://www.thebroad.org/prism).
 Organoid cohorts: GEO accessions GSE194249 (PDAC), GSE103990 (BLCA) and the
 CRC organoid drug-screen publication cohort.
+
+## Pretrained weights
+
+All 28 trained checkpoints (~710 MB, fp32) plus per-variant config files are
+distributed as a single archive:
+
+* **Google Drive:** [OrgDrug_weights_v1.zip](https://drive.google.com/file/d/1chcFRRfo2bC6sWSxcDfGPTI0-pVG1uGQ/view?usp=sharing)
+* verify with `python scripts/download_weights.py --verify-only`
+* or fetch directly: `python scripts/download_weights.py`
+
+After extraction `models/` contains (naming: `<arch>_<pretrain>_<seed>.pt`):
+
+| File family | Seeds | Role |
+|---|---|---|
+| `orgdrug_expanded_s{42,123,456}.pt` | 3 | full-architecture pretrain on the 534,299-pair GDSC2+PRISM union (LCLO warm start, organoid PRISM-warm transfer) |
+| `orgdrug_classic_expanded_s{42,123,456}.pt` | 3 | classic shell (no Transformer/gating) pretrained on the same union |
+| `orgdrug_prism_s{42,123,456}.pt` | 3 | PRISM-pretrained full model (LCLO PRISM-init recipe) |
+| `orgdrug_classic_prism_s{42,123,456,s7,s2024}.pt` | 5 | PRISM-pretrained classic (Grand-11 / mega-ensemble members) |
+| `orgdrug{,_classic}_prism_tox_s{42,123,456}.pt` | 3+3 | PRISM-AUC toxicity heads |
+| `orgdrug{,_classic}_prism_tox_cellsplit_s{42,123,456}.pt` | 3+3 | toxicity deployment/cold-start splits |
+| `orgdrug*_config*.json` | — | exact hyperparameters per variant |
+
+Checksums for every file are in `SHA256SUMS.txt` inside the archive. Weights
+were trained on GDSC2 and PRISM (academic-use licences) and are provided for
+non-commercial research only.
 
 ## Reproducing the published-baseline comparison (manuscript Tables 1 & 2)
 
